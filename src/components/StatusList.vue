@@ -82,7 +82,7 @@
 
 
               </p>
-                <div v-else :class="[ page.status.includes('Fail') ? 'text-red-500' :'text-gray-400']">
+                <div v-else class="text-xs" :class="[ page.status.includes('Fail') ? 'text-red-500' :'text-gray-400']">
                 {{ page.status }}
                 </div>
             </div>
