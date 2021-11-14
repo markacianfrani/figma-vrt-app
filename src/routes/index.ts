@@ -1,10 +1,18 @@
 import { createWebHashHistory, createRouter } from "vue-router";
+import { store } from '../store'
 
 const routes = [
   {
     path: "/",
     name: "Home",
     component: () => import("../components/PageSnapshot.vue"),
+    beforeEnter: (to: any , from: any, next: any) => {
+      if (!store.state.token && !store.state.fileId) {
+        next('/settings')
+      } else {
+        next()
+      }
+    }
   },
   {
     path: "/settings",
