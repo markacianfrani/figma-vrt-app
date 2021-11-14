@@ -156,12 +156,12 @@ export default {
       this.loading = false;
     },
 
-    openImage(node) {
-      const window = window.open("about:blank");
+    openImage(imageData) {
+      const newWindow = window.open("about:blank");
       const image = new Image();
-      image.src = node.baselineImage;
+      image.src = imageData
       setTimeout(function () {
-        window.document.write(image.outerHTML);
+        newWindow.document.write(image.outerHTML);
       }, 0);
     },
     convertDataURIToBinary(dataURI) {
