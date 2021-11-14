@@ -5,7 +5,7 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: () => import("../components/PageSnapshot.vue"),
+    component: () => import("../views/PageDashboard.vue"),
     beforeEnter: (to: any , from: any, next: any) => {
       if (!store.state.token && !store.state.fileId) {
         next('/settings')

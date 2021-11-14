@@ -99,10 +99,7 @@
 <script>
 import pixelmatch from "pixelmatch";
 import { CheckIcon } from "@heroicons/vue/solid";
-import BaseList from "./BaseList.vue";
-import BaseModal from "./BaseModal.vue";
 export default {
-  components: { BaseList, BaseModal },
   name: "StepDiff",
   props: ["pageSet", "pages"],
   components: { CheckIcon },
