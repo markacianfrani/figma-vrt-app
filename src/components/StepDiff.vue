@@ -2,7 +2,7 @@
   <div>
     <div class="m-auto flex mb-8">
       <button
-        @click.prevent="goDiff"
+        @click="goDiff"
         type="button"
         :disabled="loading"
         class="
@@ -31,6 +31,9 @@
     </div>
     <div
       class="mb-4 bg-white overflow-hidden shadow rounded-lg"
+      :class="[
+        page.diffPercent > 0 ? 'border-red-500 border-2' : 'border-gray-400',
+      ]"
       v-for="(page, index) in pages"
       :key="index"
     >
@@ -40,56 +43,65 @@
         </h3>
       </div>
       <div class="px-4 py-5 sm:p-6">
-        <div class="grid grid-cols-3 gap-4">
-          <a
-            href="#"
-            @click.prevent="openImage(page.baselineImage)"
-            style="width: 350px; height: 350px"
-            class="border-4 hover:border-gray-300 overflow-hidden"
-          >
-            <canvas :ref="`${page.nodeId}-baseline`"></canvas>
-          </a>
-          <a
-            href="#"
-            class="overflow-hidden border-4 hover:border-gray-300"
-            style="width: 350px; height: 350px"
-            @click.prevent="openImage(page.comparisionImage)"
-          >
-            <div
-              v-if="!page.comparisionImage"
-              class="
-                absolute
-                top-1/2
-                left-1/2
-                transform
-                -translate-x-1/2 -translate-y-1/2
-              "
+        <div class="grid gap-4 grid-cols-3">
+          <div>
+            <span class="text-sm text-gray-400">Baseline</span>
+            <a
+              href="#"
+              @click.prevent="openImage(page.baselineImage)"
+              style="width: 350px; height: 350px"
+              class="border-4 hover:border-gray-300 overflow-hidden block"
             >
-              No Comparision Image
-            </div>
-            <canvas :ref="`${page.nodeId}-comparision`"></canvas>
-          </a>
-          <a
-            href="#"
-            class="relative overflow-hidden border-4 hover:border-gray-300"
-            @click.prevent="openImage(page.diffImage)"
-            style="width: 350px; height: 350px"
-          >
-            <div
-              v-if="!page.diffImage"
-              class="
-                absolute
-                top-1/2
-                left-1/2
-                transform
-                -translate-x-1/2 -translate-y-1/2
-              "
+              <canvas :ref="`${page.nodeId}-baseline`"></canvas>
+            </a>
+          </div>
+          <div>
+            <span class="text-sm text-gray-400">Comparision</span>
+            <a
+              href="#"
+              class="overflow-hidden border-4 hover:border-gray-300 block"
+              style="width: 350px; height: 350px"
+              @click.prevent="openImage(page.comparisionImage)"
             >
-              No Diff
-            </div>
+              <div
+                v-if="!page.comparisionImage"
+                class="
+                  absolute
+                  top-1/2
+                  left-1/2
+                  transform
+                  -translate-x-1/2 -translate-y-1/2
+                "
+              >
+                No Comparision Image
+              </div>
+              <canvas :ref="`${page.nodeId}-comparision`"></canvas>
+            </a>
+          </div>
+          <div class="relative">
+            <span class="text-sm text-gray-400">Difference</span>
+            <a
+              href="#"
+              class="overflow-hidden border-4 hover:border-gray-300 block"
+              @click.prevent="openImage(page.diffImage)"
+              style="width: 350px; height: 350px"
+            >
+              <div
+                v-if="!page.diffImage"
+                class="
+                  absolute
+                  top-1/2
+                  left-1/2
+                  transform
+                  -translate-x-1/2 -translate-y-1/2
+                "
+              >
+                No Diff
+              </div>
 
-            <canvas :ref="`${page.nodeId}-diff`" class="nhidden"></canvas>
-          </a>
+              <canvas :ref="`${page.nodeId}-diff`" class="nhidden"></canvas>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -105,7 +117,7 @@ export default {
   components: { CheckIcon },
   data() {
     return {
-      loading: true,
+      loading: false,
       diffComplete: false,
       images: [],
     };
@@ -159,7 +171,7 @@ export default {
     openImage(imageData) {
       const newWindow = window.open("about:blank");
       const image = new Image();
-      image.src = imageData
+      image.src = imageData;
       setTimeout(function () {
         newWindow.document.write(image.outerHTML);
       }, 0);
@@ -178,6 +190,7 @@ export default {
       return array;
     },
     goDiff() {
+      this.loading = true;
       this.pages.forEach((page) => {
         page.status = "Calculating...";
         const baselineCanvas = this.$refs[`${page.nodeId}-baseline`];
@@ -209,7 +222,7 @@ export default {
         page.diffPercent = diffCount;
         page.status = "Done";
       });
-      console.log("diffing");
+      this.loading = false;
     },
   },
 };
