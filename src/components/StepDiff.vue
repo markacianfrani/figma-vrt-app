@@ -109,9 +109,7 @@ export default {
   data() {
     return {
       loading: true,
-      open: false,
       diffComplete: false,
-      diffErrors: [],
       images: [],
     };
   },
@@ -161,17 +159,13 @@ export default {
       this.loading = false;
     },
 
-    openImage(imageData) {
-      let w = window.open("about:blank");
-      let image = new Image();
-      image.src = imageData;
+    openImage(node) {
+      const window = window.open("about:blank");
+      const image = new Image();
+      image.src = node.baselineImage;
       setTimeout(function () {
-        w.document.write(image.outerHTML);
+        window.document.write(image.outerHTML);
       }, 0);
-    },
-    openModal() {
-      console.log("heard clcik");
-      this.open = true;
     },
     convertDataURIToBinary(dataURI) {
       var BASE64_MARKER = ";base64,";

@@ -1,7 +1,7 @@
 import axios from "axios";
 // import { mockGetNodeAsPng, mockGetPages } from "./api/mocks";
 import { store } from "./store";
-import router from './routes'
+import router from "./routes";
 export class Client {
   client: any;
   fileId = "";
@@ -1284,8 +1284,7 @@ export class Client {
 
   async getNode(nodeId: string) {
     return this.client
-      .get(`files/${this.fileId}/nodes?ids=${nodeId}`, {
-      })
+      .get(`files/${this.fileId}/nodes?ids=${nodeId}`, {})
       .then((r: any) => {
         return r.data;
       })
@@ -1295,24 +1294,24 @@ export class Client {
   }
 
   async getPages() {
-//     const pages = mockGetPages;
-//     const pageNames = pages.reduce((ac: any, a: any) => {
-//       return { ...ac, [a.id]: a.name };
-//     }, {});
-//     return Promise.resolve(pageNames);
+    //     const pages = mockGetPages;
+    //     const pageNames = pages.reduce((ac: any, a: any) => {
+    //       return { ...ac, [a.id]: a.name };
+    //     }, {});
+    //     return Promise.resolve(pageNames);
 
-        return this.client
-          .get(`files/${this.fileId}?depth=1`)
-          .then((r: any) => {
-            const pages = r.data.document.children;
-            return pages.reduce((ac: any, a: any) => {
-              return { ...ac, [a.id]: a.name };
-            }, {});
-          })
-          .catch((e: any) => {
-            console.log(e.message);
-	    router.push('/error')
-          });
+    return this.client
+      .get(`files/${this.fileId}?depth=1`)
+      .then((r: any) => {
+        const pages = r.data.document.children;
+        return pages.reduce((ac: any, a: any) => {
+          return { ...ac, [a.id]: a.name };
+        }, {});
+      })
+      .catch((e: any) => {
+        console.log(e.message);
+        router.push("/error");
+      });
   }
 
   async getBase64(url: string) {
@@ -1326,16 +1325,20 @@ export class Client {
           reject(e);
         });
 
-      const reader = new FileReader();
-      reader.readAsDataURL(img);
-      reader.onloadend = function () {
-        const base64data = reader.result;
-        if (base64data) {
-          resolve(base64data);
-        } else {
-          reject();
-        }
-      };
+      try {
+        const reader = new FileReader();
+        reader.readAsDataURL(img);
+        reader.onloadend = function () {
+          const base64data = reader.result;
+          if (base64data) {
+            resolve(base64data);
+          } else {
+            reject();
+          }
+        };
+      } catch (e) {
+        reject('unable to save')
+      }
     });
   }
 

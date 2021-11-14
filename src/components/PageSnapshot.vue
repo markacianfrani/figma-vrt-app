@@ -1,12 +1,19 @@
 <template>
   <div>
     <base-steps @step-changed="onStepChange" :steps="steps"></base-steps>
-     <div v-if="currentStep.id == 1">
-      <step-baseline class="mt-4" :loading="loading" @fetch="fetchBaselines"></step-baseline>
+    <div v-if="currentStep.id == 1">
+      <step-baseline
+        class="mt-4"
+        :loading="loading"
+        @fetch="submitSnapshotFetch('baseline')"
+      ></step-baseline>
     </div>
 
     <div v-if="currentStep.id == 2">
-      <step-comparision :loading="loading" @fetch="fetchComparisions"></step-comparision>
+      <step-comparision
+        :loading="loading"
+        @fetch="submitSnapshotFetch('comparision')"
+      ></step-comparision>
     </div>
     <status-list class="mt-4" :pages="filteredPages"></status-list>
 
@@ -20,8 +27,6 @@
         :selected-pages="checkedPages"
       ></step-select-pages>
     </div>
-
-   
 
     <div v-if="currentStep.id == 3">
       <step-diff :pages="filteredPages" :page-set="pageSet"></step-diff>
@@ -89,51 +94,21 @@ export default {
       this.checkedPages = pages;
       this.setStep(1);
     },
-    openImage(node) {
-      let w = window.open("about:blank");
-      let image = new Image();
-      image.src = node.baselineImage;
-      setTimeout(function () {
-        w.document.write(image.outerHTML);
-      }, 0);
-    },
+
     onStepChange(step) {
       this.setStep(step);
     },
-    async fetchComparisions() {
-      console.log("fetchin compars");
-      this.loading = true;
-      for (const pageIndex in this.filteredPages) {
-        const page = this.filteredPages[pageIndex];
-        page.status = "fetching compare";
-        const urlResponse = await this.client.getNodeAsPng(page.nodeId);
-        const url = Object.values(urlResponse)[0];
-        const imageBase64 = await this.client.getBase64(url);
-        page.setComparisionImage(imageBase64);
-        page.status = "";
-      }
- 
-      this.setStep(3);
-      this.loading = false;
-    },
     async getPages() {
-      try {
-        this.loading = true;
-        this.pageSet.clearPages();
-        this.checkedPages = [];
-        const pages = await this.client.getPages();
-        console.log("pages", pages);
-        for (const nodeId in pages) {
-          const page = new Page(pages[nodeId], nodeId);
-          this.pageSet.addPage(page);
-          // this.checkedPages.push(nodeId)
-        }
-
-        this.loading = false;
-      } catch (e) {
-        console.log(e);
-        this.$router.push("/error");
+      this.loading = true;
+      this.pageSet.clearPages();
+      this.checkedPages = [];
+      const pages = await this.client.getPages();
+      console.log("pages", pages);
+      for (const nodeId in pages) {
+        const page = new Page(pages[nodeId], nodeId);
+        this.pageSet.addPage(page);
       }
+      this.loading = false;
     },
     setStep(name) {
       this.steps.map((step) => {
@@ -148,32 +123,59 @@ export default {
         }
       });
     },
-    async fetchBaselines() {
-      this.loading = true;
-      // const images = await this.client.getNodeAsPng(this.checkedPages);
-      this.filteredPages.map(page => {
-        page.status = 'Preparing...'
-      })
-
-      for (const pageIndex in this.filteredPages) {
-        const page = this.filteredPages[pageIndex];
+    fetchAndSaveSnapshot(page, context) {
+      return new Promise((resolve, reject) => {
         page.status = "Snapshotting...";
-        const urlResponse = await this.client.getNodeAsPng(page.nodeId);
-        const url = Object.values(urlResponse)[0];
-        const imageBase64 = await this.client.getBase64(url);
-        page.setBaselineImage(imageBase64);
-        page.status = "";
-      }
+        this.client
+          .getNodeAsPng(page.nodeId)
+          .then((urlResponse) => {
+            const url = Object.values(urlResponse)[0];
+            this.client
+              .getBase64(url)
+              .then((imageBase64) => {
+                if (context === "baseline") {
+                  page.setBaselineImage(imageBase64);
+                }
 
-      // for (const image in images) {
-      //   if (images[image]) {
-      //     const page = this.pageSet.getPageByNodeId(image);
-      //     const imagebase = await this.client.getBase64(images[image]);
-      //     page.setBaselineImage(imagebase);
-      //   }
-      // }
-      this.setStep(2);
-      this.loading = false;
+                if (context === "comparision") {
+                  page.setComparisionImage(imageBase64);
+                }
+
+                page.status = "";
+                resolve();
+              })
+              .catch((e) => {
+                page.status = "Failed to fetch Snapshot";
+                reject(e);
+              });
+          })
+          .catch((e) => {
+            page.status = "Failed to fetch Snapshot";
+            reject(e);
+          });
+      });
+    },
+    async submitSnapshotFetch(context) {
+      this.loading = true;
+      const images = this.filteredPages.map((page) =>
+        this.fetchAndSaveSnapshot(page, context)
+      );
+
+      Promise.all(images)
+        .then(() => {
+          if (context === "baseline") {
+            this.setStep(2);
+          }
+
+          if (context === "comparision") {
+            this.setStep(3);
+          }
+          this.loading = false;
+        })
+        .catch((e) => {
+          console.log("Error occurred fetching a Page", e);
+          this.loading = false;
+        });
     },
   },
 };
