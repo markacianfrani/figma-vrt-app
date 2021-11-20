@@ -12,7 +12,9 @@
     <div v-if="currentStep.id == 2">
       <step-comparision
         :loading="loading"
+        :branches="branches"
         @fetch="submitSnapshotFetch('comparision')"
+        @selectBranch="selectBranch"
       ></step-comparision>
     </div>
     <status-list class="mt-4" :pages="filteredPages"></status-list>
@@ -56,7 +58,9 @@ export default {
   },
   data() {
     return {
+      branches: [],
       client: null,
+      selectedBranch: null,
       pageSet: null,
       steps: [
         { id: 0, name: "Select Pages", href: "#", status: "current" },
@@ -69,6 +73,7 @@ export default {
     };
   },
   created() {
+    this.selectedBranch = null
     this.client = new Client();
     this.pageSet = new PageSet();
   },
@@ -89,6 +94,9 @@ export default {
     },
   },
   methods: {
+    selectBranch(e) {
+      this.selectedBranch = e
+    },
     saveSelectedPages(pages) {
       this.checkedPages = pages;
       this.setStep(1);
@@ -101,8 +109,12 @@ export default {
       this.loading = true;
       this.pageSet.clearPages();
       this.checkedPages = [];
-      const pages = await this.client.getPages();
-      console.log("pages", pages);
+      const data = await this.client.getPages();
+      const pages = data.pages
+      console.log('data', data);
+      if (data.branches) {
+        this.branches = data.branches
+      }
       for (const nodeId in pages) {
         const page = new Page(pages[nodeId], nodeId);
         this.pageSet.addPage(page);
@@ -125,6 +137,9 @@ export default {
     fetchAndSaveSnapshot(page, context) {
       return new Promise((resolve, reject) => {
         page.status = "Snapshotting...";
+        if (this.selectedBranch) {
+          this.client.setBranchId(this.selectedBranch)
+        }
         this.client
           .getNodeAsPng(page.nodeId)
           .then((urlResponse) => {
@@ -151,7 +166,10 @@ export default {
           .catch((e) => {
             page.status = "Failed to fetch Snapshot";
             reject(e);
-          });
+          })
+          .finally(() => {
+            this.client.restoreMainFileId()
+          })
       });
     },
     async submitSnapshotFetch(context) {

@@ -1,16 +1,29 @@
 import axios, { AxiosInstance } from "axios";
-import { store } from "./store";
+import store from "./store";
 import router from "./routes";
 export class Client {
-  client: AxiosInstance
+  client: AxiosInstance;
+  ogFileId = ""
   fileId = "";
 
   constructor() {
+    //@ts-ignore
+    this.ogFileId = store.state.user.fileId
     this.client = axios.create({
       baseURL: `https://api.figma.com/v1/`,
-      headers: { "X-Figma-Token": store.state.token },
+      //@ts-ignore
+      headers: { "X-Figma-Token": store.state.user.token },
     });
-    this.fileId = store.state.fileId;
+    //@ts-ignore
+    this.fileId = store.state.user.fileId;
+  }
+
+  restoreMainFileId() {
+    this.fileId = this.ogFileId
+  }
+
+  setBranchId(branchId: string) {
+    this.fileId = branchId
   }
 
   async getNode(nodeId: string) {
@@ -26,15 +39,34 @@ export class Client {
 
   async getPages() {
     return this.client
-      .get(`files/${this.fileId}?depth=1`)
+      .get(`files/${this.fileId}?depth=1&branch_data=true`)
       .then((r: any) => {
-        const pages = r.data.document.children;
-        return pages.reduce((ac: any, a: any) => {
+        const children = r.data.document.children;
+        const pages =  children.reduce((ac: any, a: any) => {
           return { ...ac, [a.id]: a.name };
         }, {});
+        return {
+          pages: pages,
+          branches: r.data.branches
+        }
       })
       .catch((e: any) => {
         console.log(e.message);
+        router.push("/error");
+      });
+  }
+
+  async getBranches() {
+    return this.client
+      .get(`files/${this.fileId}?depth=1&branch_data=true`)
+      .then((r) => {
+        if (r.data && r.data.branches) {
+          return r.data.branches;
+        } else {
+          return [];
+        }
+      })
+      .catch((e) => {
         router.push("/error");
       });
   }
@@ -62,7 +94,7 @@ export class Client {
           }
         };
       } catch (e) {
-        reject('unable to save')
+        reject("unable to save");
       }
     });
   }
@@ -73,7 +105,7 @@ export class Client {
         return r.data.images;
       })
       .catch((e: any) => {
-        console.log(e.message)
+        console.log(e.message);
       });
   }
 }

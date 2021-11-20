@@ -1,5 +1,5 @@
 import { createWebHashHistory, createRouter } from "vue-router";
-import { store } from '../store'
+import store from '../store'
 
 const routes = [
   {
@@ -7,7 +7,8 @@ const routes = [
     name: "Home",
     component: () => import("../views/PageDashboard.vue"),
     beforeEnter: (to: any , from: any, next: any) => {
-      if (!store.state.token && !store.state.fileId) {
+      //@ts-ignore
+      if (!store.state.user.token && !store.state.user.fileId) {
         next('/settings')
       } else {
         next()

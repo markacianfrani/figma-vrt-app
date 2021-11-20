@@ -129,13 +129,14 @@ export default {
     };
   },
   created() {
-    this.token = this.$store.state.token;
-    this.file_id = this.$store.state.fileId;
+    console.log('this.', this.$store.state);
+    this.token = this.$store.state.user.token;
+    this.file_id = this.$store.state.user.fileId;
   },
   methods: {
     saveSettings() {
-      this.$store.commit("addToken", this.token);
-      this.$store.commit("addFileId", this.file_id);
+      this.$store.commit("user/addToken", this.token);
+      this.$store.commit("user/addFileId", this.file_id);
       alert('settings saved')
     },
   },

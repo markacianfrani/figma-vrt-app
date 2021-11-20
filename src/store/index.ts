@@ -1,22 +1,10 @@
 import { createStore, MutationTree } from "vuex";
-interface UserState {
-  token: string;
-  fileId: string;
-}
+import user from "./user";
 // Create a new store instance.
-export const store = createStore({
-  state(): UserState {
-    return {
-      token: "",
-      fileId: "",
-    };
-  },
-  mutations: {
-    addToken(state: UserState, payload: string) {
-      state.token = payload;
-    },
-    addFileId(state: UserState, payload: string) {
-      state.fileId = payload;
-    }
+const store = createStore({
+  modules: {
+    user,
   },
 });
+
+export default store;
