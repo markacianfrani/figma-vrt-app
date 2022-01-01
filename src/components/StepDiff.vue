@@ -191,6 +191,7 @@ export default {
     },
     goDiff() {
       this.loading = true;
+      this.$gtag.event('diff', { event_category: 'usage'})
       this.pages.forEach((page) => {
         page.status = "Calculating...";
         const baselineCanvas = this.$refs[`${page.nodeId}-baseline`];

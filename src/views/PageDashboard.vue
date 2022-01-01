@@ -220,6 +220,7 @@ export default {
     },
     async submitSnapshotFetch(context) {
       this.loading = true;
+      this.$gtag.event('snapshot', { event_category: 'usage', event_label: context })
       const images = this.filteredPages.map((page) =>
         this.fetchAndSaveSnapshot(page, context)
       );
