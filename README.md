@@ -1,23 +1,7 @@
-# Figma Visual Regression Tool 
+# Figma Visual Regression Tool
 
-Say you wanna change a color and you want to make sure you don't break your design system.
+Say you wanna change a color and you want to make sure you don't break your design system. This tool will take your Figma file, scan all of your pages and create snapshots of them. After that, you can go into your file, make some changes, and run another scan. It will then diff each snapshot and alert you if there are any regressions. 
 
-## Installation
-
-clone repo.
-
-`npm i`
-### Build the Electron app
-
-`npm run app:build` 
-
-Open `dist_electron/FigmaVRT*.dmg`
-
-
-### Run locally
-
-`npm run dev`
-
-## Usage
-
-First thing you want to do is go to Settings and put in your Figma access token and file id.
+Inspired by [BackstopJS](https://github.com/garris/BackstopJS)
+Built with Vue
+Powered by [Pixelmatch](https://github.com/mapbox/pixelmatch)
