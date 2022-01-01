@@ -2,7 +2,6 @@
   <div class="bg-white">
     <main class="pt-8">
       <div class="relative">
-        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gray-100" />
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div class="relative shadow-xl sm:rounded-2xl sm:overflow-hidden">
             <div class="absolute inset-0">
@@ -51,7 +50,7 @@
                 "
               >
                 <a
-                  href="#"
+                  href="https://immense-sierra-78743.herokuapp.com/connect/figma"
                   class="
                     flex
                     items-center
@@ -81,7 +80,7 @@
       <div class="relative pt-16 pb-32 overflow-hidden">
         <div
           aria-hidden="true"
-          class="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-gray-100"
+          class="absolute inset-x-0 top-0 h-48  from-gray-100"
         />
         <div class="relative">
           <div
