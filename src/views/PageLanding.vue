@@ -288,6 +288,7 @@
               v-for="item in footerNavigation.social"
               :key="item.name"
               :href="item.href"
+              target="_blank"
               class="text-gray-400 hover:text-gray-500"
             >
               <span class="sr-only">{{ item.name }}</span>
@@ -323,7 +324,7 @@ const footerNavigation = {
     },
     {
       name: "GitHub",
-      href: "https://github.com/markacianfrani",
+      href: "https://github.com/markacianfrani/figma-vrt-app",
       icon: defineComponent({
         render: () =>
           h("svg", { fill: "currentColor", viewBox: "0 0 24 24" }, [
