@@ -50,7 +50,7 @@
                 "
               >
                 <a
-                  href="https://immense-sierra-78743.herokuapp.com/connect/figma"
+                  href="https://figma-vrt-oauth.vercel.app/connect/figma"
                   class="
                     flex
                     items-center

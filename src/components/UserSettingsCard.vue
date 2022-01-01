@@ -118,7 +118,7 @@ export default {
   methods: {
     login() {
       window.location.href =
-        "https://immense-sierra-78743.herokuapp.com/connect/figma";
+        "https://figma-vrt-oauth.vercel.app/connect/figma";
     },
     async validateToken() {
       try {
