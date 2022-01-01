@@ -12,7 +12,7 @@ export class Client {
     this.client = axios.create({
       baseURL: `https://api.figma.com/v1/`,
       //@ts-ignore
-      headers: { "X-Figma-Token": store.state.user.token },
+      headers: { "Authorization": `Bearer ${store.state.user.token}` },
     });
     //@ts-ignore
     this.fileId = store.state.user.fileId;
@@ -52,7 +52,7 @@ export class Client {
       })
       .catch((e: any) => {
         console.log(e.message);
-        router.push("/error");
+        router.push("/app/error");
       });
   }
 
@@ -67,7 +67,7 @@ export class Client {
         }
       })
       .catch((e) => {
-        router.push("/error");
+        router.push("/app/error");
       });
   }
 
