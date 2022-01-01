@@ -26,6 +26,19 @@ export class Client {
     this.fileId = branchId
   }
 
+  async getMe() {
+    return this.client
+    .get(`me`, {})
+    .then((r: any) => {
+      return r.data;
+    })
+    // .catch((e: any) => {
+    //   console.log(e.message);
+    //   throw new Error(e)
+    // });
+
+  }
+
   async getNode(nodeId: string) {
     return this.client
       .get(`files/${this.fileId}/nodes?ids=${nodeId}`, {})

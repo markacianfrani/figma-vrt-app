@@ -25,12 +25,9 @@
             Figma Connection Status
           </h2>
           <div class="ml-auto flex items-center">
-            <div
-              class="rounded-full h-4 w-4"
-              :class="[hasToken ? 'bg-green-500' : 'bg-red-500']"
-            ></div>
-            <span class="text-gray-400 text-sm ml-2">
-              {{ hasToken ? "Connected" : "Not Connected" }}
+            <div class="rounded-full h-4 w-4" :class="statusColor"></div>
+            <span class="text-gray-400 text-sm ml-2 capitalize">
+              {{ status }}
             </span>
           </div>
         </div>
@@ -38,11 +35,14 @@
         <div class="mt-6">
           <div class="flex" v-if="hasToken">
             <div class="mr-4 flex-shrink-0">
-		    <img :src="user.userImage" alt="" class="h-16 w-16 border border-gray-300 bg-white text-gray-300">
-              
+              <img
+                :src="user.userImage"
+                alt=""
+                class="h-16 w-16 border border-gray-300 bg-white text-gray-300"
+              />
             </div>
             <div>
-              <h4 class="text-lg font-bold">{{user.userName}}</h4>
+              <h4 class="text-lg font-bold">{{ user.userName }}</h4>
               <p class="mt-1">
                 {{ user.userEmail }}
               </p>
@@ -50,7 +50,7 @@
           </div>
           <div class="flex" v-else>
             <button
-	    @click.prevent="login"
+              @click.prevent="login"
               class="
                 m-auto
                 bg-gray-800
@@ -82,27 +82,54 @@
 
 <script>
 import { ExclamationIcon } from "@heroicons/vue/outline";
+import { Client } from "../client";
+
 export default {
   name: "UserSettingsCard",
   components: { ExclamationIcon },
+  data() {
+    return {
+      client: null,
+      status: "pending",
+    };
+  },
+  created() {
+    this.client = new Client();
+    this.validateToken();
+  },
   computed: {
+    statusColor() {
+      if (this.status === "connected") {
+        return "bg-green-500";
+      }
+
+      if (this.status === "failed") {
+        return "bg-red-500";
+      }
+      return "bg-yellow-500";
+    },
     hasToken() {
-      return this.$store.getters["user/hasToken"];
+      return this.status === "connected";
     },
     user() {
       return this.$store.state.user;
     },
   },
   methods: {
-	  login() {
-		  window.location.href = "https://immense-sierra-78743.herokuapp.com/connect/figma"
-	  },
-    validateToken() {
-      console.log("validating");
+    login() {
+      window.location.href =
+        "https://immense-sierra-78743.herokuapp.com/connect/figma";
+    },
+    async validateToken() {
+      try {
+        const me = await this.client.getMe();
+        if (me) {
+          this.status = "connected";
+        }
+      } catch (e) {
+        this.status = "failed";
+      }
     },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-</style>
