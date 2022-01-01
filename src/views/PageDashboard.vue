@@ -73,9 +73,12 @@ export default {
     };
   },
   created() {
-    this.selectedBranch = null
-    this.client = new Client();
-    this.pageSet = new PageSet();
+    const validated = this.validate();
+    if (validated) {
+      this.selectedBranch = null;
+      this.client = new Client();
+      this.pageSet = new PageSet();
+    }
   },
   computed: {
     filteredPages() {
@@ -84,7 +87,11 @@ export default {
       );
     },
     pages() {
-      return this.pageSet.pages;
+      if (this.pageSet) {
+        return this.pageSet.pages;
+      } else {
+        return [];
+      }
     },
     hasPages() {
       return this.pages && this.pages.length > 0;
@@ -94,8 +101,34 @@ export default {
     },
   },
   methods: {
+    validate() {
+      if (!this.$store.getters["user/hasToken"]) {
+        this.$router.push({
+          name: "error",
+          params: {
+            errorTitle: "Authentication with Figma failed",
+            errorMessage:
+              "Unable to connect to Figma. Verify your settings are correct.",
+          },
+        });
+        return false;
+      }
+
+      if (!this.$store.getters["user/hasFileId"]) {
+        this.$router.push({
+          name: "error",
+          params: {
+            errorTitle: "Missing File ID",
+            errorMessage: "Enter a valid Figma File ID in the Settings page.",
+          },
+        });
+        return false;
+      }
+
+      return true;
+    },
     selectBranch(e) {
-      this.selectedBranch = e
+      this.selectedBranch = e;
     },
     saveSelectedPages(pages) {
       this.checkedPages = pages;
@@ -106,20 +139,33 @@ export default {
       this.setStep(step);
     },
     async getPages() {
+      if (!this.pageSet) {
+        return [];
+      }
       this.loading = true;
       this.pageSet.clearPages();
       this.checkedPages = [];
-      const data = await this.client.getPages();
-      const pages = data.pages
-      console.log('data', data);
-      if (data.branches) {
-        this.branches = data.branches
+      try {
+        const data = await this.client.getPages();
+        const pages = data.pages;
+        if (data.branches) {
+          this.branches = data.branches;
+        }
+        for (const nodeId in pages) {
+          const page = new Page(pages[nodeId], nodeId);
+          this.pageSet.addPage(page);
+        }
+        this.loading = false;
+      } catch {
+        this.$router.push({
+          name: "error",
+          params: {
+            errorTitle: "Error",
+            errorMessage:
+              "Unable to connect to Figma. Verify your settings are correct.",
+          },
+        });
       }
-      for (const nodeId in pages) {
-        const page = new Page(pages[nodeId], nodeId);
-        this.pageSet.addPage(page);
-      }
-      this.loading = false;
     },
     setStep(name) {
       this.steps.map((step) => {
@@ -138,7 +184,7 @@ export default {
       return new Promise((resolve, reject) => {
         page.status = "Snapshotting...";
         if (this.selectedBranch) {
-          this.client.setBranchId(this.selectedBranch)
+          this.client.setBranchId(this.selectedBranch);
         }
         this.client
           .getNodeAsPng(page.nodeId)
@@ -168,8 +214,8 @@ export default {
             reject(e);
           })
           .finally(() => {
-            this.client.restoreMainFileId()
-          })
+            this.client.restoreMainFileId();
+          });
       });
     },
     async submitSnapshotFetch(context) {

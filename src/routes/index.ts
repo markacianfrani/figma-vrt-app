@@ -5,14 +5,13 @@ import {
 } from "vue-router";
 import store from "../store";
 function removeQueryParams(to: any, next: any) {
-  console.log("todo", to.query['profile[email]']);
 
   if (to.query.access_token) {
     store.commit("user/addToken", to.query.access_token);
-    store.commit("user/addUserEmail", to.query['profile[email]']);
-    store.commit("user/addUserName", to.query['profile[handle]']);
-    store.commit("user/addUserImage", to.query['profile[img_url]']);
-    return '/app/settings'
+    store.commit("user/addUserEmail", to.query["profile[email]"]);
+    store.commit("user/addUserName", to.query["profile[handle]"]);
+    store.commit("user/addUserImage", to.query["profile[img_url]"]);
+    return "/app/settings";
   }
 
   if (Object.keys(to.query).length)
@@ -40,30 +39,16 @@ const routes = [
       },
       {
         path: "/app/error",
-        name: "Error",
+        name: "error",
         component: () => import("../views/PageError.vue"),
+        props: true,
       },
       {
         path: "/app/generic",
         name: "Generic",
         component: () => import("../views/PageGeneric.vue"),
-      }
-    ],
-    beforeEnter: (to: any, from: any, next: any) => {
-      console.log('hastoken',store.getters['user/hasToken']);
-      
-      if (store.getters['user/hasToken']) {
-        next()
-      } else {
-        console.log('no token');
-        next()
-        
-      }
-      console.log('store', store.getters);
-      
-      
-      // ...
-    }
+      },
+    ]
   },
 
   {
