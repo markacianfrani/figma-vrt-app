@@ -1,18 +1,22 @@
 import axios, { AxiosInstance } from "axios";
 import store from "./store";
 import router from "./routes";
+
 export class Client {
-  client: AxiosInstance;
-  ogFileId = ""
-  fileId = "";
+  private readonly client: AxiosInstance;
+  private readonly ogFileId: string;
+  private fileId: string;
 
   constructor() {
     //@ts-ignore
     this.ogFileId = store.state.user.fileId
     this.client = axios.create({
-      baseURL: `https://api.figma.com/v1/`,
-      //@ts-ignore
-      headers: { "Authorization": `Bearer ${store.state.user.token}` },
+      baseURL: 'https://api.figma.com/v1/',
+      headers: {
+        //@ts-ignore
+        'Authorization': `Bearer ${store.state.user.token}`,
+        'Content-Type': 'application/json'
+      }
     });
     //@ts-ignore
     this.fileId = store.state.user.fileId;
