@@ -9,23 +9,33 @@
                 class="absolute inset-0 bg-gradient-to-r from-purple-800 to-indigo-700 mix-blend-multiply"
               />
             </div>
-            <div class="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-32 lg:px-8">
-              <h1
-                class="text-center text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl"
-              >
-                <span class="block text-white">Figma Visual Regression Testing</span>
-              </h1>
-              <p
-                class="mt-6 max-w-lg mx-auto text-center text-xl text-indigo-200 sm:max-w-3xl"
-              >Take snapshots. Make changes. Compare results.</p>
-              <div class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
-                <a
-                  href="https://figma-vrt-oauth.vercel.app/connect/figma"
-                  @click="login"
-                  class="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-indigo-700 bg-white hover:bg-indigo-50 sm:px-8"
-                >Login with Figma</a>
-              </div>
-            </div>
+             <div class="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-32 lg:px-8">
+               <h1
+                 class="text-center text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl"
+               >
+                 <span class="block text-white">Figma Visual Regression Testing</span>
+               </h1>
+               <div class="mt-6 max-w-lg mx-auto text-center sm:max-w-3xl">
+                 <div class="bg-red-600 text-white p-6 rounded-lg mb-6">
+                   <h2 class="text-xl font-bold mb-2">⚠️ This App is No Longer Functional</h2>
+                   <p class="text-sm">
+                     Due to Figma's updated developer platform policy, this application can no longer authenticate with Figma.
+                     All OAuth apps must be re-published with new requirements by November 17, 2025.
+                   </p>
+                   <p class="text-sm mt-2">
+                     <a href="https://developers.figma.com/docs/updates-to-figmas-developer-platform"
+                        class="underline hover:no-underline"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                       Learn more about Figma's policy changes →
+                     </a>
+                   </p>
+                 </div>
+                 <p class="text-indigo-200 text-lg">
+                   This tool was designed to help teams maintain design consistency by comparing visual snapshots of Figma files.
+                 </p>
+               </div>
+             </div>
           </div>
         </div>
       </div>
@@ -151,11 +161,7 @@ export default {
   
   mounted () {
   },
-  methods: {
-    login() {
-       this.$gtag.event('login', { event_category: 'usage' })
-    }
-  },
+
 };
 </script>
 
