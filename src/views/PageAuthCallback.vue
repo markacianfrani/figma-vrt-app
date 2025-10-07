@@ -1,36 +1,30 @@
 <template>
-  <div>whatup</div>
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div v-if="error" class="text-red-500">
+        {{ error }}
+      </div>
+      <div v-else class="text-gray-600">
+        Authenticating... Redirecting to settings...
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   name: "PageAuthCallback",
-  props: ['params'],
   data() {
     return {
-      queryData: {},
       error: null,
     };
   },
   created() {
-	  console.log(this.params);
-    this.queryData = this.$route.query;
-    this.logMeIn(this.queryData)
-  },
-  methods: {
-    logMeIn(data) {
-      if (!data.access_token) {
-        this.error = "Missing access token";
-      }
-
-//       this.$store.commit("user/addToken", data.access_token);
-
-      if (data['profile[handle]']) {
-      this.$store.commit("user/addUserName", data['profile[handle]']);
-
-
-      }
-    },
+    // Authentication is handled in router beforeEnter guard
+    // Just redirect to settings after a brief delay
+    setTimeout(() => {
+      this.$router.push('/app/settings');
+    }, 1000);
   },
 };
 </script>
